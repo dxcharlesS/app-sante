@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>MediQueue Mobile - Gestion de File d'Attente Médicale</title>
+  
+  <!-- PWA & Mobile Meta -->
+  <meta name="theme-color" content="#0066cc">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="MediQueue">
+  <link rel="manifest" href="./manifest.json">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="./css/app.css">
+</head>
+<body>
+
+  <!-- Device Simulator Shell -->
+  <div class="device-shell">
+
+    <!-- Mobile Simulated Status Bar -->
+    <div class="status-bar">
+      <span id="statusBarClock">09:41</span>
+      <div class="status-bar-icons">
+        <span>📶</span>
+        <span>5G</span>
+        <span>🔋</span>
+      </div>
+    </div>
+
+    <!-- Application Top Header -->
+    <header class="app-header">
+      <div class="header-brand">
+        <div class="app-logo-badge">🏥</div>
+        <div class="header-title-block">
+          <h1>MediQueue</h1>
+          <div class="header-subtitle">Santé & File d'Attente</div>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <!-- Quick Role Switcher Pill -->
+        <button id="btnRoleSwitcher" class="role-switch-btn" title="Changer de rôle (Démo)">
+          <span>⚡ Rôles</span>
+        </button>
+
+        <!-- Notification Bell -->
+        <button class="btn-icon-header" onclick="window.MediQueueUI.switchTab('notifications')" title="Notifications">
+          <span>🔔</span>
+          <span id="headerNotifBadge" class="badge-counter" style="display: none;">0</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Toast Notifications Layer -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- VIEW 1: AUTHENTICATION (Login / Inscription) -->
+    <div id="viewAuth" class="main-view-container">
+      <div class="card text-center" style="padding: 26px 16px; margin-top: 10px;">
+        <div style="font-size: 52px; margin-bottom: 8px;">🏥</div>
+        <h2 style="font-size: 20px; font-weight: 800; color: var(--primary);">Bienvenue sur MediQueue</h2>
+        <p class="text-muted" style="font-size: 13px;">Votre file d'attente médicale interactive et connectée</p>
+
+        <!-- Tab Selector -->
+        <div class="filter-tabs mt-3">
+          <button id="tabLoginBtn" class="filter-tab active">Connexion</button>
+          <button id="tabSignupBtn" class="filter-tab">Inscription Patient</button>
+        </div>
+
+        <!-- Login Form -->
+        <form id="formLogin" class="mt-3" onsubmit="return false;">
+          <div class="form-group" style="text-align: left;">
+            <label for="loginEmail">Adresse Email</label>
+            <input type="email" id="loginEmail" class="form-control" placeholder="exemple@sante.fr" value="p@test.com" required>
+          </div>
+          <div class="form-group" style="text-align: left;">
+            <label for="loginPassword">Mot de passe</label>
+            <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" value="Test1234!" required>
+          </div>
+          <button id="btnSubmitLogin" class="btn btn-primary btn-block btn-lg mt-2">
+            Se connecter
+          </button>
+        </form>
+
+        <!-- Signup Form -->
+        <form id="formSignup" class="mt-3 hidden" onsubmit="return false;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; text-align: left;">
+            <div class="form-group">
+              <label>Nom</label>
+              <input type="text" id="signupLastName" class="form-control" placeholder="Dupont" required>
+            </div>
+            <div class="form-group">
+              <label>Prénom</label>
+              <input type="text" id="signupFirstName" class="form-control" placeholder="Jean" required>
+            </div>
+          </div>
+          <div class="form-group" style="text-align: left;">
+            <label>Email</label>
+            <input type="email" id="signupEmail" class="form-control" placeholder="jean.dupont@email.com" required>
+          </div>
+          <div class="form-group" style="text-align: left;">
+            <label>Téléphone</label>
+            <input type="tel" id="signupPhone" class="form-control" placeholder="06 12 34 56 78" required>
+          </div>
+          <div class="form-group" style="text-align: left;">
+            <label>Genre</label>
+            <select id="signupGender" class="form-control">
+              <option value="M">Masculin</option>
+              <option value="F">Féminin</option>
+              <option value="Autre">Autre</option>
+            </select>
+          </div>
+          <div class="form-group" style="text-align: left;">
+            <label>Mot de passe</label>
+            <input type="password" id="signupPassword" class="form-control" placeholder="Min. 8 caractères" required>
+            <div id="signupStrengthIndicator" class="mt-1 hidden" style="font-size: 11px; font-weight: 700;"></div>
+          </div>
+          <div class="form-group" style="text-align: left;">
+            <label>Confirmer le mot de passe</label>
+            <input type="password" id="signupPasswordConfirm" class="form-control" placeholder="Confirmez votre mot de passe" required>
+          </div>
+          <button id="btnSubmitSignup" class="btn btn-primary btn-block btn-lg mt-2">
+            Créer mon compte
+          </button>
+        </form>
+      </div>
+
+      <!-- Quick Demo Access Badges -->
+      <div class="card">
+        <div class="card-title-row">
+          <span class="card-title">🚀 Accès Rapide Démo</span>
+        </div>
+        <p class="text-muted" style="font-size: 12px; margin-bottom: 10px;">
+          Cliquez pour tester l'application directement avec un profil type :
+        </p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+          <button class="btn btn-sm btn-outline" onclick="window.MediQueueAuth.loginAsRole('patient'); window.MediQueueUI.render(); window.MediQueueUI.showToast('Connecté en tant que Patient', 'success');">
+            👤 Patient (Jean)
+          </button>
+          <button class="btn btn-sm btn-outline" onclick="window.MediQueueAuth.loginAsRole('doctor'); window.MediQueueUI.render(); window.MediQueueUI.showToast('Connecté en tant que Médecin', 'success');">
+            🩺 Médecin (Dr. Pierre)
+          </button>
+          <button class="btn btn-sm btn-outline" onclick="window.MediQueueAuth.loginAsRole('receptionist'); window.MediQueueUI.render(); window.MediQueueUI.showToast('Connecté en Accueil', 'success');">
+            📋 Accueil (Marie)
+          </button>
+          <button class="btn btn-sm btn-outline" onclick="window.MediQueueAuth.loginAsRole('admin'); window.MediQueueUI.render(); window.MediQueueUI.showToast('Connecté en Admin', 'success');">
+            ⚡ Admin (Sophie)
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 2: LOGGED IN APPLICATION VIEW -->
+    <div id="viewApp" style="display: flex; flex-direction: column; flex: 1; overflow: hidden;" class="hidden">
+      <!-- Active User Bar -->
+      <div class="user-role-bar">
+        <div class="user-identity">
+          <div id="userAvatar" class="user-avatar">J</div>
+          <div>
+            <div id="userName" style="font-weight: 700; color: var(--gray-800); line-height: 1.1;">Utilisateur</div>
+            <span id="userRoleBadge" class="user-role-pill role-patient">Patient</span>
+          </div>
+        </div>
+
+        <button class="btn btn-sm btn-outline" style="padding: 3px 8px; font-size: 11px;" onclick="window.MediQueueAuth.logout(); window.MediQueueUI.render(); window.MediQueueUI.showToast('Déconnecté', 'info');">
+          Déconnexion
+        </button>
+      </div>
+
+      <!-- Scrollable Main View Area -->
+      <main id="mainScrollArea" class="main-view-container"></main>
+
+      <!-- Mobile Bottom Navigation Bar -->
+      <nav class="bottom-nav">
+        <button class="nav-tab-item active" data-tab="ticket">
+          <span class="nav-icon">🎟️</span>
+          <span>File & Pass</span>
+        </button>
+
+        <button class="nav-tab-item" data-tab="notifications">
+          <span class="nav-icon">🔔</span>
+          <span>Notifs</span>
+        </button>
+
+        <button class="nav-tab-item" data-tab="profile">
+          <span class="nav-icon">⚙️</span>
+          <span>Profil</span>
+        </button>
+      </nav>
+    </div>
+
+  </div> <!-- End Device Simulator Shell -->
+
+  <!-- MODAL 1: TAKE VIRTUAL TICKET (For Patient) -->
+  <div id="takeTicketModal" class="modal-backdrop">
+    <div class="modal-sheet">
+      <div class="modal-drag-indicator"></div>
+      <div class="modal-header">
+        <h3 class="modal-title">Prendre un Ticket Virtuel</h3>
+        <button class="modal-close-btn" onclick="window.MediQueueUI.closeModals()">✕</button>
+      </div>
+
+      <div class="form-group">
+        <label>Service médical souhaité</label>
+        <select id="selectTicketService" class="form-control">
+          <option value="Consultation Générale">🩺 Consultation Générale</option>
+          <option value="Pédiatrie">👶 Pédiatrie</option>
+          <option value="Urgences">🚨 Urgences / Soins non programmés</option>
+          <option value="Cardiologie">❤️ Cardiologie</option>
+          <option value="Radiologie">🦴 Radiologie</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Degré d'urgence / Priorité</label>
+        <select id="selectTicketPriority" class="form-control">
+          <option value="normal">🟢 Normal (Ordre d'arrivée)</option>
+          <option value="urgent">🔴 Urgent (Douleurs intenses, fièvre élevée)</option>
+          <option value="non-urgent">🟡 Non-urgent (Renouvellement ordonnance, certificat)</option>
+          <option value="scheduled">📅 Consultation Planifiée</option>
+        </select>
+      </div>
+
+      <button id="btnConfirmTakeTicket" class="btn btn-primary btn-lg btn-block mt-3">
+        Valider et prendre mon tour
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL 2: STAFF ADD PATIENT TO QUEUE (Doctor / Receptionist / Admin) -->
+  <div id="addPatientModal" class="modal-backdrop">
+    <div class="modal-sheet">
+      <div class="modal-drag-indicator"></div>
+      <div class="modal-header">
+        <h3 class="modal-title">Ajouter un Patient en File</h3>
+        <button class="modal-close-btn" onclick="window.MediQueueUI.closeModals()">✕</button>
+      </div>
+
+      <div class="form-group">
+        <label>Sélectionner le patient</label>
+        <select id="selectAddPatientId" class="form-control"></select>
+      </div>
+
+      <div class="form-group">
+        <label>Service</label>
+        <select id="selectAddPatientService" class="form-control">
+          <option value="Consultation Générale">Consultation Générale</option>
+          <option value="Pédiatrie">Pédiatrie</option>
+          <option value="Urgences">Urgences</option>
+          <option value="Cardiologie">Cardiologie</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Priorité</label>
+        <select id="selectAddPatientPriority" class="form-control">
+          <option value="normal">Normal</option>
+          <option value="urgent">Urgent</option>
+          <option value="non-urgent">Non-urgent</option>
+          <option value="scheduled">Planifié</option>
+        </select>
+      </div>
+
+      <button id="btnConfirmAddStaffPatient" class="btn btn-primary btn-lg btn-block mt-3">
+        Émettre le ticket et ajouter à la file
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL 3: QUICK ROLE SWITCHER -->
+  <div id="roleSwitcherModal" class="modal-backdrop">
+    <div class="modal-sheet">
+      <div class="modal-drag-indicator"></div>
+      <div class="modal-header">
+        <h3 class="modal-title">Changer de Profil de Test</h3>
+        <button class="modal-close-btn" onclick="window.MediQueueUI.closeModals()">✕</button>
+      </div>
+
+      <p class="text-muted" style="font-size: 13px; margin-bottom: 16px;">
+        Passez instantanément d'un profil à un autre pour simuler les interactions entre patient et personnel médical :
+      </p>
+
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <button class="btn btn-block btn-outline" style="justify-content: flex-start; padding: 14px;" onclick="window.MediQueueAuth.loginAsRole('patient'); window.MediQueueUI.closeModals(); window.MediQueueUI.render(); window.MediQueueUI.showToast('Connecté en tant que Patient (Jean)', 'success');">
+          <span style="font-size: 24px; margin-right: 8px;">👤</span>
+          <div style="text-align: left;">
+            <div style="font-weight: 700;">Jean Dupont (Patient)</div>
+            <div class="text-muted" style="font-size: 11px;">Suivre le ticket virtuel et attendre l'appel</div>
+          </div>
+        </button>
+
+        <button class="btn btn-block btn-outline" style="justify-content: flex-start; padding: 14px;" onclick="window.MediQueueAuth.loginAsRole('doctor'); window.MediQueueUI.closeModals(); window.MediQueueUI.render(); window.MediQueueUI.showToast('Connecté en tant que Médecin (Dr. Pierre)', 'success');">
+          <span style="font-size: 24px; margin-right: 8px;">🩺</span>
+          <div style="text-align: left;">
+            <div style="font-weight: 700;">Dr. Pierre Martin (Médecin)</div>
+            <div class="text-muted" style="font-size: 11px;">Appeler les patients et gérer les consultations</div>
+          </div>
+        </button>
+
+        <button class="btn btn-block btn-outline" style="justify-content: flex-start; padding: 14px;" onclick="window.MediQueueAuth.loginAsRole('receptionist'); window.MediQueueUI.closeModals(); window.MediQueueUI.render(); window.MediQueueUI.showToast('Connecté en Accueil (Marie)', 'success');">
+          <span style="font-size: 24px; margin-right: 8px;">📋</span>
+          <div style="text-align: left;">
+            <div style="font-weight: 700;">Marie Laurent (Accueil & Réception)</div>
+            <div class="text-muted" style="font-size: 11px;">Enregistrer les patients et attribuer les tickets</div>
+          </div>
+        </button>
+
+        <button class="btn btn-block btn-outline" style="justify-content: flex-start; padding: 14px;" onclick="window.MediQueueAuth.loginAsRole('admin'); window.MediQueueUI.closeModals(); window.MediQueueUI.render(); window.MediQueueUI.showToast('Connecté en Administrateur (Sophie)', 'success');">
+          <span style="font-size: 24px; margin-right: 8px;">⚡</span>
+          <div style="text-align: left;">
+            <div style="font-weight: 700;">Sophie Dubois (Administrateur)</div>
+            <div class="text-muted" style="font-size: 11px;">Supervision, statistiques cliniques et gestion</div>
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 4: TICKET DETAILS / QR CODE MODAL -->
+  <div id="ticketDetailsModal" class="modal-backdrop">
+    <div class="modal-sheet">
+      <div class="modal-drag-indicator"></div>
+      <div class="modal-header">
+        <h3 class="modal-title">Détails de mon Pass</h3>
+        <button class="modal-close-btn" onclick="window.MediQueueUI.closeModals()">✕</button>
+      </div>
+      <div id="ticketDetailsContent"></div>
+    </div>
+  </div>
+
+  <!-- Application Logic Scripts -->
+  <script src="./js/store.js"></script>
+  <script src="./js/audio.js"></script>
+  <script src="./js/queue.js"></script>
+  <script src="./js/auth.js"></script>
+  <script src="./js/ui.js"></script>
+  <script src="./js/app.js"></script>
+
+  <!-- Live Clock Script for Status Bar -->
+  <script>
+    function updateClock() {
+      const now = new Date();
+      const clock = document.getElementById('statusBarClock');
+      if (clock) {
+        clock.textContent = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+      }
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+  </script>
+</body>
+</html>

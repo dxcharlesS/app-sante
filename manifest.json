@@ -1,0 +1,22 @@
+{
+  "name": "MediQueue Mobile - Gestion de File d'Attente",
+  "short_name": "MediQueue",
+  "description": "Application mobile de gestion de file d'attente médicale en temps réel",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0066cc",
+  "theme_color": "#0066cc",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='40' fill='%230066cc'/><path d='M96 40v112M40 96h112' stroke='white' stroke-width='24' stroke-linecap='round'/></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='100' fill='%230066cc'/><path d='M256 100v312M100 256h312' stroke='white' stroke-width='60' stroke-linecap='round'/></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}
